@@ -317,6 +317,38 @@
             }
         }
 
+        /* Shooting Stars */
+        .shooting-star {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .shooting-star::before {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8),
+                        -2px -2px 15px rgba(255, 255, 255, 0.4);
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .shooting-star::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(to left, rgba(255, 255, 255, 0.8), transparent);
+            left: -150px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .title {
@@ -369,6 +401,11 @@
                 <p style="margin-top: 15px;">
                     Im Tübingen mit besonderen Themen oder Reutlingen bei der vhsrt mit einem richtigen Teleskop!
                 </p>
+                <p style="margin-top: 15px;">
+                    🎉🎉 HAPPY BRITHDAY LUIS! 🎉🎉
+                </p>
+                <p>Feier schön in den nächsten Tagen und hoffentlich freust du dich schon auf die Sternenwarte !!!</p>
+                <p>Ich freu mich, dass du mein Bruder bist ❤️</p>
             </div>
 
             <div class="features">
@@ -404,7 +441,7 @@
                 <h3>⏰ Sternenführungen (Tue)</h3>
                 <div class="times-list">
                     <div><strong>🕘 Zeit:</strong> Zu den Terminen auf der Website: https://www.sternwarte-tuebingen.de/</div>
-                    <div><strong>🔬 Themen:</strong> Planeten, Galaxien, Nebel & mehr</div>
+                    <div><strong>🔬 Themen:</strong> Nach Programm</div>
                     <div><strong>⏱️ Dauer:</strong> ca. 90-120 Minuten</div>
                     <div><strong>📍 Ort:</strong> Sternwarte Tübingen, Waldhäuser Str. 70</div>
                 </div>
@@ -466,6 +503,81 @@
 
         // Initialize
         createStarfield();
+
+        // Shooting Stars
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            
+            // Random starting position from edges
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight * 0.6; // Focus on upper half
+            
+            // Random vector: angle between -45 and -135 degrees (downward and to the right/left)
+            const angle = -90 + (Math.random() - 0.5) * 90; // Range: -135 to -45 degrees
+            const radians = (angle * Math.PI) / 180;
+            
+            // Distance to travel
+            const distance = Math.random() * 400 + 200;
+            
+            // End position based on vector
+            const endX = startX + Math.cos(radians) * distance;
+            const endY = startY + Math.sin(radians) * distance;
+            
+            // Duration of travel
+            const duration = Math.random() * 0.8 + 0.6;
+            
+            star.style.left = startX + 'px';
+            star.style.top = startY + 'px';
+            star.style.transform = `rotate(${angle}deg)`;
+            
+            document.body.appendChild(star);
+            
+            // Animate using CSS transform
+            const keyframes = `
+                @keyframes shootingOrbit {
+                    0% {
+                        opacity: 0;
+                        transform: rotate(${angle}deg) translateX(0);
+                    }
+                    10% {
+                        opacity: 1;
+                    }
+                    90% {
+                        opacity: 1;
+                    }
+                    100% {
+                        opacity: 0;
+                        transform: rotate(${angle}deg) translateX(${distance}px);
+                    }
+                }
+            `;
+            
+            // Inject keyframes
+            if (!document.getElementById('shooting-star-keyframes')) {
+                const style = document.createElement('style');
+                style.id = 'shooting-star-keyframes';
+                style.innerHTML = '';
+                document.head.appendChild(style);
+            }
+            
+            const sheet = document.getElementById('shooting-star-keyframes').sheet;
+            if (sheet && sheet.insertRule) {
+                const ruleIndex = sheet.cssRules.length;
+                sheet.insertRule(keyframes.trim(), ruleIndex);
+            }
+            
+            star.style.animation = `shootingOrbit ${duration}s ease-in forwards`;
+            
+            setTimeout(() => star.remove(), duration * 1000);
+        }
+
+        // Create shooting stars periodically
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                createShootingStar();
+            }
+        }, 1000);
 
         // Enhance buttons with particle effects
         document.querySelectorAll('.btn').forEach(btn => {
